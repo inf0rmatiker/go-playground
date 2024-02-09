@@ -124,13 +124,12 @@ func heapify(parentIndex int, underlyingArray []int) {
 func (h *MaxHeap) Extract() (bool, int) {
 
 	// Sanity check: is someone trying to extract from an empty heap?
-	if len(h.underlyingArray) < 1 {
+	size := h.GetSize()
+	if size < 1 {
 		return false, -1
 	}
 
 	root := h.underlyingArray[0]
-	size := h.GetSize()
-
 	if size == 1 {
 		// Only one thing in the heap so just remove it, and we're done.
 		h.underlyingArray = h.underlyingArray[:0]
