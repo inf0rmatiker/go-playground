@@ -1,7 +1,9 @@
 package main
 
 import (
-	"github.com/inf0rmatiker/go-playground/internal/datastructures/linkedlist"
+	"fmt"
+	"github.com/inf0rmatiker/go-playground/internal/algorithms/dp"
+	"github.com/inf0rmatiker/go-playground/internal/datastructures/stack"
 	"github.com/inf0rmatiker/go-playground/internal/examples"
 )
 
@@ -38,14 +40,48 @@ func main() {
 	//}
 	//heap.Print()
 
-	ll := linkedlist.New()
-	ll.Append(5)
-	ll.Append(6)
-	ll.Append(9)
-	ll.Append(3)
-	ll.Prepend(15)
-	ll.Insert(88, 0)
-	ll.Insert(99, 0)
-	ll.Insert(33, 2)
-	ll.Print()
+	//
+
+	/* Algorithms */
+
+	n := 10
+	distinctWays := dp.StaircaseRecursiveSolution(n)
+	fmt.Printf("Normal Recursive:\tThere are %d distinct ways to climb a staircase of %d steps\n", distinctWays, n)
+
+	distinctWays = dp.StaircaseDPIterativeBottomUp(n)
+	fmt.Printf("Iterative DP:\t\tThere are %d distinct ways to climb a staircase of %d steps\n", distinctWays, n)
+
+	distinctWays = dp.StaircaseDPIterativeBottomUpMinimalMemory(n)
+	fmt.Printf("Iterative DP (minimal memory):\t\tThere are %d distinct ways to climb a staircase of %d steps\n", distinctWays, n)
+
+	distinctWays = dp.StaircaseDPRecursiveBottomUp(n)
+	fmt.Printf("Recursive DP:\t\tThere are %d distinct ways to climb a staircase of %d steps\n", distinctWays, n)
+
+	//cost := []int{10, 15, 20}
+	cost := []int{100, 1, 1, 1, 1, 100, 1, 1, 100, 1}
+	minCost := dp.MinCostStaircaseRecursive(cost)
+	fmt.Printf("Normal Recursive:\t\tMin cost would be %d\n", minCost)
+
+	minCost = dp.MinCostStaircaseMemoization(cost)
+	fmt.Printf("Memoized DP:\t\tMin cost would be %d\n", minCost)
+
+	nums := []int{1, 3, 2, 2, 5}
+	maxRobbed := dp.RobHousesRecursive(nums)
+	fmt.Printf("Normal Recursive:\t\tMax robbed would be %d\n", maxRobbed)
+
+	nums = []int{1, 3, 2, 2, 5}
+	maxRobbed = dp.RobHousesRecursive(nums)
+	fmt.Printf("Memoization:\t\tMax robbed would be %d\n", maxRobbed)
+
+	pString := "abc"
+	fmt.Println(dp.PalindromicSubstrings(pString))
+
+	fmt.Println(dp.DecodeWaysMemoized("110"))
+
+	fmt.Println(dp.UniquePaths(5, 7))
+
+	s := stack.Stack[int]{}
+	s.Put(3)
+	s.Print()
+
 }
