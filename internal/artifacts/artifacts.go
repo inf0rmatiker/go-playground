@@ -2,14 +2,19 @@ package artifacts
 
 import (
 	"archive/tar"
+	"bufio"
+	"bytes"
 	"compress/gzip"
 	"context"
 	"fmt"
 	"io"
 	"os"
+	"os/exec"
 	"path/filepath"
+	"strings"
 
 	log "github.com/sirupsen/logrus"
+	"github.com/walle/targz"
 )
 
 // Gameplan:
@@ -21,7 +26,10 @@ import (
 
 // ExtractArtifacts extracts the provided artifacts archive (tgz file) to
 // the configured artifacts directory, creating it if it does not already exist.
-func ExtractArtifacts(ctx context.Context, logger *log.Logger, archivePath, artifactsDir string) error {
+func ExtractArtifacts(ctx context.Context, archivePath, artifactsDir string, logger *log.Logger) error {
+
+	fqdn := GetFqdn()
+	logger.Infof("FQDN: %s", fqdn)
 
 	// Create the artifacts directory if it does not already exist. If it does
 	// already exist, no error will be returned.
@@ -60,7 +68,7 @@ func ExtractArtifacts(ctx context.Context, logger *log.Logger, archivePath, arti
 		}
 
 		targetPath := filepath.Join(artifactsDir, header.Name)
-		logger.Infof("Extracting to %s", targetPath)
+		logger.Infof("%s -> %s", header.Name, targetPath)
 		switch header.Typeflag {
 		case tar.TypeDir:
 			// Create directory with same permissions as in the tarball
@@ -75,12 +83,62 @@ func ExtractArtifacts(ctx context.Context, logger *log.Logger, archivePath, arti
 			}
 			defer outFile.Close() // Ensure each file is closed
 
-			// Stream from tarReader to outFile
-			if _, err := io.Copy(outFile, tarReader); err != nil {
-				return fmt.Errorf("failed to copy content to file %s: %w", targetPath, err)
+			// Catch *.repo files and fix their baseurls to point to Admin node's artifact webserver
+			// instead of DAOS public packages repo.
+			if filepath.Ext(header.Name) == ".repo" {
+				log.Infof("Found repofile: %s", header.Name)
+				directory := filepath.Dir(strings.TrimPrefix(header.Name, "./"))
+				if err = ReplaceBaseurl(ctx, outFile, tarReader, fqdn, directory, logger); err != nil {
+					return fmt.Errorf("failed to update baseurl in repofile %s: %w", targetPath, err)
+				}
+			} else {
+				// Just copy original contents (as an IO stream) from tarReader to outFile
+				if _, err := io.Copy(outFile, tarReader); err != nil {
+					return fmt.Errorf("failed to copy content to file %s: %w", targetPath, err)
+				}
 			}
 		default:
 			log.Printf("Skipping unsupported tar entry type: %c for %s\n", header.Typeflag, header.Name)
 		}
 	}
+}
+
+func ExtractArtifactsWithLib(ctx context.Context, archivePath, artifactsDir string, logger *log.Logger) error {
+	// Create the artifacts directory if it does not already exist. If it does
+	// already exist, no error will be returned.
+	if err := os.MkdirAll(artifactsDir, 0644); err != nil {
+		logger.Errorf("Failed to create artifacts directory %s: %v", artifactsDir, err)
+		return err
+	}
+
+	return targz.Extract(archivePath, artifactsDir)
+}
+
+func GetFqdn() string {
+	cmd := exec.Command("/bin/hostname", "-f")
+	var out bytes.Buffer
+	cmd.Stdout = &out
+	err := cmd.Run()
+	if err != nil {
+		log.Error(err)
+	}
+	fqdn := out.String()
+	fqdn = fqdn[:len(fqdn)-1] // removing EOL
+	return fqdn
+}
+
+func ReplaceBaseurl(ctx context.Context, outFile *os.File, tarReader *tar.Reader, fqdn, targetDir string, logger *log.Logger) error {
+	// Read file line by line, looking for baseurl lines to update
+	scanner := bufio.NewScanner(tarReader)
+	for scanner.Scan() {
+		line := scanner.Text()
+		if strings.HasPrefix(line, "baseurl=") {
+			log.Infof("Found baseurl line: %s", line)
+			line = fmt.Sprintf("baseurl=https://%s/artifacts/%s", fqdn, targetDir)
+		}
+		if _, err := outFile.WriteString(line + "\n"); err != nil {
+			return fmt.Errorf("failed to write to file %s: %w", outFile.Name(), err)
+		}
+	}
+	return nil
 }

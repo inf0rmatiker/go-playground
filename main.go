@@ -1,27 +1,18 @@
 package main
 
 import (
-	"context"
 	"fmt"
-	"os"
 
-	"github.com/inf0rmatiker/go-playground/internal/artifacts"
+	"github.com/inf0rmatiker/go-playground/internal/generics"
 	log "github.com/sirupsen/logrus"
 )
 
 func main() {
 	fmt.Printf("Hello world\n")
+	log.Info("Hello world from logger\n")
 
-	args := os.Args
-	var src, dest string
-	if len(args) != 3 {
-		log.Errorf("Usage: %s <source> <destination>", args[0])
-	}
-	src = args[1]
-	dest = args[2]
+	log.Infof("'a' lt 'b' = %t", generics.Compare("a", "b", "lt"))
+	log.Infof("'b' lt 'a' = %t", generics.Compare("b", "a", "lt"))
+	log.Infof("1 lt 3 = %t", generics.Compare(1, 3, "lt"))
 
-	err := artifacts.ExtractArtifacts(context.TODO(), log.StandardLogger(), src, dest)
-	if err != nil {
-		log.Errorf("Error extracting artifacts: %v", err)
-	}
 }
