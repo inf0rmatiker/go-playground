@@ -6,11 +6,8 @@ import (
 	"os"
 	"os/signal"
 	"syscall"
-	"time"
 
-	"github.com/inf0rmatiker/go-playground/internal/examples/ping"
-
-	log "github.com/sirupsen/logrus"
+	"github.com/inf0rmatiker/go-playground/internal/examples"
 )
 
 func registerSigHandler(ctxCancel context.CancelFunc) {
@@ -35,21 +32,14 @@ func registerSigHandler(ctxCancel context.CancelFunc) {
 
 func main() {
 
-	mainCtx, cancel := context.WithCancel(context.Background())
+	_, cancel := context.WithCancel(context.Background())
 	registerSigHandler(cancel)
 	defer cancel()
 
-	if len(os.Args) != 3 {
-		log.Fatalf("Usage: %s <interface> <address>", os.Args[0])
-	}
-	iface, addr := os.Args[1], os.Args[2]
-
-	pingerTimeout := 5 * time.Second // time out after 5 seconds
-	pingerCtx, pCancel := context.WithTimeout(mainCtx, pingerTimeout)
-	defer pCancel()
-	pinger := ping.DefaultPinger{}
-	err := pinger.Ping2(pingerCtx, iface, addr, log.StandardLogger())
+	err := examples.ReadLines()
 	if err != nil {
-		log.Error(err)
+		fmt.Printf("ERROR: %v\n", err)
+		os.Exit(1)
 	}
+
 }
