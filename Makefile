@@ -15,6 +15,7 @@ vet:
 .PHONY: bin
 bin: fmt vet
 	go build -v -o main .
+	sudo setcap cap_net_raw=+ep ./main
 
 .PHONY: clean
 clean:

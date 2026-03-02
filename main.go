@@ -39,10 +39,16 @@ func main() {
 	registerSigHandler(cancel)
 	defer cancel()
 
-	pingerCtx, pCancel := context.WithTimeout(mainCtx, 5*time.Second)
+	if len(os.Args) != 3 {
+		log.Fatalf("Usage: %s <interface> <address>", os.Args[0])
+	}
+	iface, addr := os.Args[1], os.Args[2]
+
+	pingerTimeout := 5 * time.Second // time out after 5 seconds
+	pingerCtx, pCancel := context.WithTimeout(mainCtx, pingerTimeout)
 	defer pCancel()
 	pinger := ping.DefaultPinger{}
-	err := pinger.Ping(pingerCtx, "enp4s0", "192.168.1.8", log.StandardLogger())
+	err := pinger.Ping2(pingerCtx, iface, addr, log.StandardLogger())
 	if err != nil {
 		log.Error(err)
 	}
