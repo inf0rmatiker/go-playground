@@ -5,7 +5,7 @@ import (
 )
 
 func TestLinkedList_Append(t *testing.T) {
-	testList := New()
+	testList := NewLinkedList[int]()
 	testList.Append(5)
 	testList.Append(9)
 	testList.Append(7)
@@ -26,7 +26,7 @@ func TestLinkedList_Append(t *testing.T) {
 }
 
 func TestLinkedList_Insert(t *testing.T) {
-	testList := New()
+	testList := NewLinkedList[int]()
 	testList.Append(5)
 	testList.Append(9)
 	testList.Append(7)
@@ -62,7 +62,7 @@ func TestLinkedList_Insert(t *testing.T) {
 }
 
 func TestLinkedList_RemoveHead(t *testing.T) {
-	testList := New()
+	testList := NewLinkedList[int]()
 	testList.Append(5)
 	testList.Append(9)
 	testList.Append(7)
@@ -82,7 +82,7 @@ func TestLinkedList_RemoveHead(t *testing.T) {
 }
 
 func TestLinkedList_RemoveTail(t *testing.T) {
-	testList := New()
+	testList := NewLinkedList[int]()
 	testList.Append(5)
 	testList.Append(9)
 	testList.Append(7)
@@ -102,7 +102,7 @@ func TestLinkedList_RemoveTail(t *testing.T) {
 }
 
 func TestLinkedList_RemoveMiddle(t *testing.T) {
-	testList := New()
+	testList := NewLinkedList[int]()
 	testList.Append(5)
 	testList.Append(9)
 	testList.Append(7)
