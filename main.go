@@ -7,7 +7,7 @@ import (
 	"os/signal"
 	"syscall"
 
-	"github.com/inf0rmatiker/go-playground/internal/examples"
+	"github.com/inf0rmatiker/go-playground/internal/algorithms/dp"
 )
 
 func registerSigHandler(ctxCancel context.CancelFunc) {
@@ -36,10 +36,11 @@ func main() {
 	registerSigHandler(cancel)
 	defer cancel()
 
-	err := examples.ReadLines()
-	if err != nil {
-		fmt.Printf("ERROR: %v\n", err)
-		os.Exit(1)
-	}
+	// coins := []int64{1, 2, 3}
+	// n := int32(4)
 
+	// fmt.Printf("Ways to make %d: %d\n", n, dp.GetWaysDpSquare(n, coins))
+
+	maxSubarray := dp.MaxSubarray([]int32{-10, 5, -10, 4, 3, -2})
+	fmt.Printf("Max subsequence sum: %d, max subarray: %d\n", maxSubarray[0], maxSubarray[1])
 }
