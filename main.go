@@ -7,7 +7,7 @@ import (
 	"os/signal"
 	"syscall"
 
-	"github.com/inf0rmatiker/go-playground/internal/algorithms/dp"
+	"github.com/inf0rmatiker/go-playground/internal/problems/dp"
 )
 
 func registerSigHandler(ctxCancel context.CancelFunc) {
