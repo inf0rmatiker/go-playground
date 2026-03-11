@@ -38,6 +38,7 @@ func ReverseListRecursive(head *ListNode) *ListNode {
 	return tail
 }
 
+// Helper function to print the linked list, used in tests for visualization.
 func printList(head *ListNode) {
 	for head != nil {
 		fmt.Printf("%d -> ", head.Val)
