@@ -1,6 +1,10 @@
 package algorithms
 
-import "testing"
+import (
+	"testing"
+
+	"github.com/stretchr/testify/assert"
+)
 
 func TestBinarySearchFound(t *testing.T) {
 	// Binary search only works with sorted lists
@@ -21,9 +25,7 @@ func TestBinarySearchFound(t *testing.T) {
 	}
 
 	for i, arr := range inputArrays {
-		if !binarySearch(searchElements[i], arr) {
-			t.Fail()
-		}
+		assert.True(t, binarySearch(searchElements[i], arr))
 	}
 }
 
@@ -48,8 +50,22 @@ func TestBinarySearchNotFound(t *testing.T) {
 	}
 
 	for i, arr := range inputArrays {
-		if binarySearch(searchElements[i], arr) {
-			t.Fail()
-		}
+		assert.False(t, binarySearch(searchElements[i], arr))
+	}
+}
+
+func TestBinarySearchMatrix(t *testing.T) {
+	matrix := [][]int{
+		{1, 2, 4, 8},
+		{10, 11, 12, 13},
+		{14, 20, 30, 40},
+	}
+
+	searchElementsTrue := []int{10, 4, 20, 30}
+	searchElementsFalse := []int{21, 45, 0, -1}
+
+	for i := range searchElementsTrue {
+		assert.True(t, searchMatrix(matrix, searchElementsTrue[i]))
+		assert.False(t, searchMatrix(matrix, searchElementsFalse[i]))
 	}
 }
