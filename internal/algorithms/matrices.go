@@ -6,7 +6,6 @@ import "sync"
 Example: a = [3 1 4],
 
 b = [ 4 3 ]
-
 	[ 2 5 ]
 	[ 6 8 ]
 
@@ -16,6 +15,8 @@ Explanation:
 	3(4) + 1(2) + 4(6) = 38
 	3(3) + 1(5) + 4(8) = 46
 */
+
+// Multiplies two 2D matrices the slow, naive way, in sequential order.
 func multiply2DNaive(a, b [][]int) [][]int {
 	numRowsA := len(a)
 	numColsA := len(a[0])
@@ -49,6 +50,8 @@ func multiply2DNaive(a, b [][]int) [][]int {
 	return result
 }
 
+// Worker function for multiplying a row of matrix A by a row in column B,
+// storing the result in the result matrix.
 func multiplyWorker(i, j int, a, b, result [][]int, wg *sync.WaitGroup) {
 	defer wg.Done()
 	sum := 0
@@ -61,6 +64,8 @@ func multiplyWorker(i, j int, a, b, result [][]int, wg *sync.WaitGroup) {
 	result[i][j] = sum
 }
 
+// Multiplies two matrices A and B concurrently, returning the resulting matrix C.
+// Concurrency is at the level of the individual element of the resulting matrix.
 func multiply2DConcurrent(a, b [][]int) [][]int {
 	numRowsA := len(a)
 	numColsA := len(a[0])
@@ -115,6 +120,8 @@ type rowResult struct {
 	Row   []int
 }
 
+// Multiplies two matrices A and B concurrently, returning the resulting matrix C.
+// Concurrency is done at the row level for each row in matrix A.
 func multiply2DConcurrentByRow(a, b [][]int) [][]int {
 	numRowsA := len(a)
 	numColsA := len(a[0])
@@ -147,8 +154,3 @@ func multiply2DConcurrentByRow(a, b [][]int) [][]int {
 
 	return result
 }
-
-/*
-
-
- */
